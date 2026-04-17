@@ -29,7 +29,9 @@ enum EventType: String, CaseIterable, Identifiable, Codable {
 struct JobEvent: Identifiable, Hashable, Codable {
     let id: UUID
     var title: String
-    var date: Date
+    var startDate: Date
+    var endDate: Date
+    var isAllDay: Bool
     var type: EventType
     var companyName: String
     var memo: String
@@ -37,14 +39,18 @@ struct JobEvent: Identifiable, Hashable, Codable {
     init(
         id: UUID = UUID(),
         title: String,
-        date: Date,
+        startDate: Date,
+        endDate: Date,
+        isAllDay: Bool = false,
         type: EventType,
         companyName: String,
         memo: String = ""
     ) {
         self.id = id
         self.title = title
-        self.date = date
+        self.startDate = startDate
+        self.endDate = endDate
+        self.isAllDay = isAllDay
         self.type = type
         self.companyName = companyName
         self.memo = memo

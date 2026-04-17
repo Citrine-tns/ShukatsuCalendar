@@ -57,12 +57,13 @@ struct CalendarScreen: View {
                         )
                         .environmentObject(store)
                     } else {
-                        WeeklyCalendarView(
+                        WeeklyTimeCalendarView(
                             currentDate: $currentDate,
                             selectedDate: $selectedDate,
                             selectedEvent: $selectedEvent
                         )
                         .environmentObject(store)
+                        .frame(minHeight: 900)
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
@@ -98,9 +99,15 @@ struct CalendarScreen: View {
                                                 .foregroundStyle(.primary)
                                                 .font(.headline)
 
-                                            Text("\(event.companyName) ・ \(event.type.rawValue)")
-                                                .foregroundStyle(.secondary)
-                                                .font(.caption)
+                                            if event.isAllDay {
+                                                Text("\(event.companyName) ・ \(event.type.rawValue) ・ 終日")
+                                                    .foregroundStyle(.secondary)
+                                                    .font(.caption)
+                                            } else {
+                                                Text("\(event.companyName) ・ \(event.type.rawValue) ・ \(timeRangeText(for: event))")
+                                                    .foregroundStyle(.secondary)
+                                                    .font(.caption)
+                                            }
                                         }
 
                                         Spacer()
@@ -123,6 +130,7 @@ struct CalendarScreen: View {
                 .padding(.top, 8)
             }
             .navigationTitle("カレンダー")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -156,7 +164,44 @@ struct CalendarScreen: View {
     private func titleText(for date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ja_JP")
-        formatter.dateFormat = "yyyy年M月"
-        return formatter.string(from: date)
+
+        switch displayMode {
+        case .month:
+            formatter.dateFormat = "yyyy年M月"
+            return formatter.string(from: date)
+
+        case .week:
+            let calendar = Calendar.current
+            let weekday = calendar.component(.weekday, from: date)
+            let startOfWeek = calendar.date(byAdding: .day, value: -(weekday - 1), to: date) ?? date
+            let endOfWeek = calendar.date(byAdding: .day, value: 6, to: startOfWeek) ?? date
+
+            let startFormatter = DateFormatter()
+            startFormatter.locale = Locale(identifier: "ja_JP")
+            startFormatter.dateFormat = "M/d"
+
+            let endFormatter = DateFormatter()
+            endFormatter.locale = Locale(identifier: "ja_JP")
+
+            if calendar.component(.year, from: startOfWeek) != calendar.component(.year, from: endOfWeek) {
+                startFormatter.dateFormat = "yyyy/M/d"
+                endFormatter.dateFormat = "yyyy/M/d"
+            } else if calendar.component(.month, from: startOfWeek) != calendar.component(.month, from: endOfWeek) {
+                startFormatter.dateFormat = "M/d"
+                endFormatter.dateFormat = "M/d"
+            } else {
+                startFormatter.dateFormat = "M/d"
+                endFormatter.dateFormat = "d"
+            }
+
+            return "\(startFormatter.string(from: startOfWeek))〜\(endFormatter.string(from: endOfWeek))"
+        }
+    }
+
+    private func timeRangeText(for event: JobEvent) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ja_JP")
+        formatter.dateFormat = "HH:mm"
+        return "\(formatter.string(from: event.startDate))〜\(formatter.string(from: event.endDate))"
     }
 }

@@ -10,7 +10,7 @@ struct ScheduleListScreen: View {
                     Text("予定がありません")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(store.events.sorted(by: { $0.date < $1.date })) { event in
+                    ForEach(store.events.sorted(by: { $0.startDate < $1.startDate })) { event in
                         VStack(alignment: .leading, spacing: 6) {
                             HStack(spacing: 8) {
                                 Circle()
@@ -25,9 +25,15 @@ struct ScheduleListScreen: View {
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
 
-                            Text(event.date.formatted(date: .long, time: .omitted))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                            if event.isAllDay {
+                                Text(event.startDate.formatted(date: .long, time: .omitted))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text("\(event.startDate.formatted(date: .long, time: .shortened)) 〜 \(event.endDate.formatted(date: .omitted, time: .shortened))")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                         .padding(.vertical, 4)
                     }

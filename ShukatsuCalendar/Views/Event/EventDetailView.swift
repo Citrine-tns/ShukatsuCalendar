@@ -24,8 +24,16 @@ struct EventDetailView: View {
                     }
                 }
 
-                Section("日付") {
-                    Text(event.date.formatted(date: .long, time: .omitted))
+                Section("日時") {
+                    if event.isAllDay {
+                        Text(event.startDate.formatted(date: .long, time: .omitted))
+                    } else {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(event.startDate.formatted(date: .long, time: .shortened))
+                            Text("〜")
+                            Text(event.endDate.formatted(date: .long, time: .shortened))
+                        }
+                    }
                 }
 
                 Section("メモ") {

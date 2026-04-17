@@ -34,7 +34,7 @@ struct MonthlyCalendarView: View {
                 } else {
                     Rectangle()
                         .fill(.clear)
-                        .frame(height: 56)
+                        .frame(height: 72)
                 }
             }
         }

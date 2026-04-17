@@ -12,17 +12,34 @@ struct DayCellView: View {
                 .fontWeight(isSelected ? .bold : .regular)
                 .foregroundStyle(.primary)
 
-            HStack(spacing: 4) {
-                ForEach(Array(events.prefix(3).enumerated()), id: \.offset) { _, event in
-                    Circle()
-                        .fill(event.type.color)
-                        .frame(width: 6, height: 6)
+            if events.isEmpty {
+                Spacer()
+                    .frame(height: 8)
+            } else {
+                VStack(spacing: 2) {
+                    ForEach(Array(events.prefix(2).enumerated()), id: \.offset) { _, event in
+                        Text(event.title)
+                            .font(.caption2)
+                            .lineLimit(1)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 2)
+                            .background(event.type.color.opacity(0.18))
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                    }
+
+                    if events.count > 2 {
+                        Text("他 \(events.count - 2) 件")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(height: 8)
         }
-        .frame(maxWidth: .infinity, minHeight: 56)
-        .padding(.vertical, 6)
+        .frame(maxWidth: .infinity, minHeight: 72, alignment: .top)
+        .padding(6)
         .background(isSelected ? Color.blue.opacity(0.18) : Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .overlay {
