@@ -2,12 +2,11 @@ import SwiftUI
 
 @main
 struct ShukatsuCalendarApp: App {
-    @StateObject private var store = EventStore()
+    private let repository: EventRepository = MockEventRepository()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(store)
+            RootTabView(repository: repository)
         }
     }
 }
