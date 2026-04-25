@@ -66,4 +66,31 @@ final class CalendarViewModel {
     func goToToday() {
         currentDate = Date()
     }
+
+    func addEvent(_ event: CalendarEvent) async {
+        do {
+            try await repository.addEvent(event)
+            await loadEvents()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func updateEvent(_ event: CalendarEvent) async {
+        do {
+            try await repository.updateEvent(event)
+            await loadEvents()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func deleteEvent(id: UUID) async {
+        do {
+            try await repository.deleteEvent(id: id)
+            await loadEvents()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 }

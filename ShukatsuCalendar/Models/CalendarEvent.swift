@@ -14,7 +14,7 @@ struct CalendarEvent: Identifiable, Codable, Hashable {
     var endAt: Date?
     var isAllDay: Bool
     var company: String?
-    var eventDescription: String?   // `description`はNSObjectと衝突するので改名
+    var eventDescription: String?   // [description]はNSObjectと衝突する
     var url: URL?
     var source: EventSource
 

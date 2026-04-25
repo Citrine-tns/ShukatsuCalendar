@@ -32,4 +32,22 @@ final class InternshipListViewModel {
         let target = calendar.startOfDay(for: date)
         return calendar.dateComponents([.day], from: now, to: target).day ?? 0
     }
+
+    func updateEvent(_ event: CalendarEvent) async {
+        do {
+            try await repository.updateEvent(event)
+            await load()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func deleteEvent(id: UUID) async {
+        do {
+            try await repository.deleteEvent(id: id)
+            await load()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 }

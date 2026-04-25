@@ -1,7 +1,7 @@
 import Foundation
 
 final class MockEventRepository: EventRepository {
-    private let events: [CalendarEvent]
+    private var events: [CalendarEvent]
 
     init() {
         let calendar = Calendar.current
@@ -104,5 +104,18 @@ final class MockEventRepository: EventRepository {
             .sorted { $0.startAt < $1.startAt }
             .prefix(limit)
             .map { $0 }
+    }
+
+    func addEvent(_ event: CalendarEvent) async throws {
+        events.append(event)
+    }
+
+    func updateEvent(_ event: CalendarEvent) async throws {
+        guard let index = events.firstIndex(where: { $0.id == event.id }) else { return }
+        events[index] = event
+    }
+
+    func deleteEvent(id: UUID) async throws {
+        events.removeAll { $0.id == id }
     }
 }

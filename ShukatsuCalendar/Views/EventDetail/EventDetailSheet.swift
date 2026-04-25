@@ -2,7 +2,11 @@ import SwiftUI
 
 struct EventDetailSheet: View {
     let event: CalendarEvent
+    let onEdit: () -> Void
+    let onDelete: () -> Void
+
     @Environment(\.dismiss) private var dismiss
+    @State private var showDeleteConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -53,6 +57,17 @@ struct EventDetailSheet: View {
                         }
                     }
 
+                    Divider()
+                    Button(role: .destructive) {
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("この予定を削除", systemImage: "trash")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.red)
+                    .padding(.top, 8)
+
                     Spacer(minLength: 0)
                 }
                 .padding()
@@ -61,9 +76,22 @@ struct EventDetailSheet: View {
             .navigationTitle("予定")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button("閉じる") { dismiss() }
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("編集") { onEdit() }
+                }
+            }
+            .confirmationDialog(
+                "この予定を削除しますか？",
+                isPresented: $showDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("削除", role: .destructive) {
+                    onDelete()
+                }
+                Button("キャンセル", role: .cancel) {}
             }
         }
     }

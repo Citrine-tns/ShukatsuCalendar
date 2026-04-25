@@ -3,6 +3,9 @@ import SwiftUI
 struct InternshipListScreen: View {
     @Bindable var viewModel: InternshipListViewModel
 
+    @State private var pendingEditEvent: CalendarEvent?
+    @State private var editingEvent: CalendarEvent?
+
     var body: some View {
         NavigationStack {
             Group {
@@ -26,9 +29,36 @@ struct InternshipListScreen: View {
             }
             .navigationTitle("インターン締切")
             .task { await viewModel.load() }
-            .sheet(item: $viewModel.selectedEvent) { event in
-                EventDetailSheet(event: event)
+            .onAppear { Task { await viewModel.load() } }
+            .sheet(item: $viewModel.selectedEvent, onDismiss: handleDetailDismiss) { event in
+                EventDetailSheet(
+                    event: event,
+                    onEdit: {
+                        pendingEditEvent = event
+                        viewModel.selectedEvent = nil
+                    },
+                    onDelete: {
+                        let id = event.id
+                        viewModel.selectedEvent = nil
+                        Task { await viewModel.deleteEvent(id: id) }
+                    }
+                )
             }
+            .sheet(item: $editingEvent) { event in
+                EventEditorSheet(
+                    mode: .edit(event),
+                    onSave: { updated in
+                        Task { await viewModel.updateEvent(updated) }
+                    }
+                )
+            }
+        }
+    }
+
+    private func handleDetailDismiss() {
+        if let pending = pendingEditEvent {
+            editingEvent = pending
+            pendingEditEvent = nil
         }
     }
 }
